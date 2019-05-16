@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Linear Regression in Data Analysis</title>
+
+<script src="lm-sales_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lm-sales_files/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
+<script src="lm-sales_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lm-sales_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lm-sales_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="lm-sales_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="lm-sales_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="lm-sales_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="lm-sales_files/navigation-1.1/tabsets.js"></script>
+<link href="lm-sales_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="lm-sales_files/highlightjs-9.12.0/highlight.js"></script>
+<script src="lm-sales_files/kePrint-0.0.1/kePrint.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="css\style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4,h5",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Linear Regression in Data Analysis</h1>
+
+</div>
+
+
+<hr />
+<!-- <div class = "document"> -->
+<div id="dataset" class="section level1">
+<h1>Dataset</h1>
+<p>Here we have a dataset with advertising information. It displays <code>sales</code> (in thousands of units) for a product, as a function of <code>advertising budgets</code> (in thousands of dollars) for TV, radio, and newspaper media.</p>
+<p>Suppose that in our role as analysts we are asked to suggest, based on this data, a <strong>marketing plan</strong> to increase sales. What information would be useful to provide such a recommendation?</p>
+<p>First, let’s explore the data…</p>
+<div id="descriptive-stats" class="section level2">
+<h2>Descriptive Stats</h2>
+It’s useful to perform basic descriptive stats to explore the data set of interest before making any hypothesis.
+<center>
+<pre><code>       TV             radio          newspaper          sales      
+ Min.   :  0.70   Min.   : 0.000   Min.   :  0.30   Min.   : 1.60  
+ 1st Qu.: 74.38   1st Qu.: 9.975   1st Qu.: 12.75   1st Qu.:10.38  
+ Median :149.75   Median :22.900   Median : 25.75   Median :12.90  
+ Mean   :147.04   Mean   :23.264   Mean   : 30.55   Mean   :14.02  
+ 3rd Qu.:218.82   3rd Qu.:36.525   3rd Qu.: 45.10   3rd Qu.:17.40  
+ Max.   :296.40   Max.   :49.600   Max.   :114.00   Max.   :27.00  </code></pre>
+</center>
+<div class="figure" style="text-align: center">
+<img src="lm-sales_files/figure-html/unnamed-chunk-2-1.png" alt=" Histogram and boxplot for sales." width="672" />
+<p class="caption">
+Histogram and boxplot for sales.
+</p>
+</div>
+<p><strong>What do we want to do?</strong></p>
+</div>
+<div id="marketing-plan" class="section level2">
+<h2>Marketing Plan</h2>
+<p>A marketing plan to increase sales! Maybe this includes answering the following:</p>
+<ol style="list-style-type: decimal">
+<li>Should we spend any money in advertising?</li>
+<li>Given a certain advertising budget, can we predict sales?</li>
+<li>Should we spend the same amount of money in each media?</li>
+<li>How accurately can we predict future sales?</li>
+<li>Is there synergy among the advertising media?</li>
+</ol>
+<p>It turns out that linear regression can be used to answer each of these questions!</p>
+<hr />
+</div>
+</div>
+<div id="simple-linear-regression" class="section level1">
+<h1>Simple Linear Regression</h1>
+<p>The first thing to remember, is that a linear regression assumes that there exists a <code>linear relationship</code> between the response variable and the explanatory variable. This means that you can fit a line between the two.</p>
+<p><img src="lm-sales_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This is a very simple approach to predicting a quantitative response (in our case <strong>sales</strong>) in terms of a single predictor variable (<strong>TV</strong> perhaps). In this case, the mathematical representation of this model would be: <span class="math display">\[sales = \beta_{0}+\beta_{1}*TV\]</span></p>
+<p><span class="math inline">\(\beta{0}\)</span> and <span class="math inline">\(\beta{1}\)</span> are the intercept and a slope of the line describing this relationship. They are known as the model <code>coefficients</code>. Once we estimate these, we can predict future based on a particular value of TV advertising.</p>
+<div id="estimating-coefficients-and-residuals" class="section level2">
+<h2>Estimating coefficients and residuals</h2>
+<p>This is equivalent to finding an intercept <span class="math inline">\(\beta{0}\)</span> and a slope <span class="math inline">\(\beta{1}\)</span> such that the resulting line is as close as possible to the data points.</p>
+<p>There are many ways of measuring <strong>closeness</strong>. However, the most common approach is the <code>least squares</code> criterion. This is in essence, minimizing the differences between the real values and the values predicted by the line in our model.</p>
+<center>
+<img src="img/sales_tv.png" />
+</center>
+<p>In this image, we see how each grey line segment represents an error (<code>residual</code>), and the fit makes a compromise by averaging their squares.</p>
+</div>
+<div id="hypothesis" class="section level2">
+<h2>Hypothesis</h2>
+<p>Standard errors can also be used to perform hypothesis tests on the coefficients. In a <code>lm</code> we test the <em>null test hypothesis</em> of <code>H0</code>: There is no relationship between X and Y.</p>
+<p>To test the null hypothesis, we need to determine whether our estimate for <span class="math inline">\(\beta{1}\)</span>, is sufficiently far from zero (significant). In practice, we compute a t-statistic, which measures the number of standard deviations that <span class="math inline">\(\beta{1}\)</span> is away from 0. Then, we estimate the probability of a given t, assuming <span class="math inline">\(\beta{1}\)</span> = 0. We call this probability the <code>P-value</code>.</p>
+<p>If P-value is small, we can infer that there is an association between the predictor and the response (reject null hypothesis). Typical p-value cutoffs for rejecting the null hypothesis are 5 or 1%.</p>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Coefficients for lm sales vs TV
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+t value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|t|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+7.0325935
+</td>
+<td style="text-align:right;">
+0.4578429
+</td>
+<td style="text-align:right;">
+15.36028
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TV
+</td>
+<td style="text-align:right;">
+0.0475366
+</td>
+<td style="text-align:right;">
+0.0026906
+</td>
+<td style="text-align:right;">
+17.66763
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Notice that the coefficients are very large relative to their standard errors, so the t-statistics are also large; the probabilities of seeing such values if H0 is true are virtually zero.</p>
+<p>The formula describing this model is <span class="math display">\[sales = 7.03+0.05*TV + Error\]</span></p>
+<p><code>Error</code> in the formula represents the deviation of the estimated values vs the true response.</p>
+<p>Using a <strong><em>simple linear model</em></strong> we can infer that an increase of $1,000 in the TV advertising budget is associated with an increase in sales by around 50 units</p>
+</div>
+<div id="model-fit" class="section level2">
+<h2>Model fit</h2>
+<p>Once we detected there is a relationship between TV and sales, we might want to quantify the extent of these.</p>
+<p>The quality of a <code>lm</code> is typically assessed using: Standard Residual Error (SRE) and the <span class="math inline">\(R^{2}\)</span> statistic.</p>
+<div id="sre" class="section level3">
+<h3>SRE</h3>
+<p>This is the average amount that the response will deviate from the true value. <strong><em>A measure of the lack of fit, in the same units of y.</em></strong></p>
+<p><span class="math display">\[SRE = sqrt(\frac{1}{n-2}*RSS) = sqrt(\frac{1}{n-2}*\sum_{i=1}^{n}(y_{i} - y_{est})^2)\]</span> <em>sum of squares residual (SSR or RSS)</em></p>
+<pre class="r"><code>lm_sales_tv_sum$sigma</code></pre>
+<pre><code>## [1] 3.258656</code></pre>
+<p>In our case, actual sales deviate from the true values by aprox. 3,260 units, on average. If we recall from our previous descriptive analysis, the mean of sales was 14,000 units, and so the percentage error is 3,260/14,000 = 23%.</p>
+</div>
+<div id="r2-statistics" class="section level3">
+<h3><span class="math inline">\(R^2\)</span> Statistics</h3>
+<p>Is the proportion of variance explained.</p>
+<ul>
+<li>Its value is between 0 and 1.</li>
+<li>Is independent of the scale of Y.</li>
+</ul>
+<p><span class="math display">\[R^2 = \frac{TSS-RSS}{TSS} = 1 - \frac{RSS}{TSS}\]</span></p>
+<p><span class="math inline">\(TSS= \sum_{i=1}^{n}(y{i} - mean)^2\)</span></p>
+<p>TSS measures the total variance in the response Y. In contrast, RSS measures the amount of variability that is left unexplained after performing the regression. An <span class="math inline">\(R^2\)</span> close to 1 indicates that a large proportion of the variability in the response has been explained by the regression.</p>
+<pre class="r"><code>lm_sales_tv_sum$r.squared</code></pre>
+<pre><code>## [1] 0.6118751</code></pre>
+<p>The <span class="math inline">\(R^2\)</span> for our sales lm was <code>0.61</code>, and so just under two-thirds of the variability in sales is explained by a linear regression on TV.</p>
+<p>Do all three media (TV, radio, and newspaper) contribute to sales? How to extend lm to more than 1 predictor?</p>
+<hr />
+</div>
+</div>
+</div>
+<div id="correlation-r" class="section level1">
+<h1>Correlation (r)</h1>
+<p>This is also a measure of the linear relationship between X and Y. The degree of association is measured by a correlation coefficient.</p>
+<ul>
+<li>The correlation coefficient is measured on a scale that varies from + 1 through 0 to - 1.</li>
+<li>When one variable increases as the other increases the correlation is positive.</li>
+<li>when one decreases as the other increases it is negative.</li>
+<li>For a simple linear regression setting, <span class="math inline">\(R^2 = r^2\)</span></li>
+</ul>
+<p>We could use a correlation matrix to help us understand this.</p>
+<div class="figure" style="text-align: center">
+<img src="lm-sales_files/figure-html/unnamed-chunk-7-1.png" alt="Correlation Matrix" width="672" />
+<p class="caption">
+Correlation Matrix
+</p>
+</div>
+<p>A strong relationship is shown by either stronger colors in the matrix or with numbers greater than <code>0.5</code>.</p>
+<p>In our case, we could highlight the following:</p>
+<ul>
+<li>TV and radio show a very strong linear relationship with the response (sales).</li>
+<li>Some predictors are correlated to each other (radio and newspaper).</li>
+</ul>
+<hr />
+</div>
+<div id="multiple-linear-regression" class="section level1">
+<h1>Multiple linear regression</h1>
+<p>Does it mean fitting multiple simple linear regression model for each predictor?</p>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Linear model sales vs. radio
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+t value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|t|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+9.3116381
+</td>
+<td style="text-align:right;">
+0.5629005
+</td>
+<td style="text-align:right;">
+16.542245
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+radio
+</td>
+<td style="text-align:right;">
+0.2024958
+</td>
+<td style="text-align:right;">
+0.0204113
+</td>
+<td style="text-align:right;">
+9.920765
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Linear model sales vs. newspaper
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+Std. Error
+</th>
+<th style="text-align:right;">
+t value
+</th>
+<th style="text-align:right;">
+Pr(&gt;|t|)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+12.3514071
+</td>
+<td style="text-align:right;">
+0.6214202
+</td>
+<td style="text-align:right;">
+19.876096
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+newspaper
+</td>
+<td style="text-align:right;">
+0.0546931
+</td>
+<td style="text-align:right;">
+0.0165757
+</td>
+<td style="text-align:right;">
+3.299591
+</td>
+<td style="text-align:right;">
+0.0011482
+</td>
+</tr>
+</tbody>
+</table>
+<p>A $1,000 increase in spending on radio advertising is associated with an average increase in sales by around 203 units, while the same increase in spending on newspaper advertising is associated with an average increase in sales by around 55 units.</p>
+<p>There are several limitations for this approach:</p>
+<ul>
+<li>It is unclear how to make a single prediction of sales given levels of the three advertising media budgets, since each of the budgets is associated with a separate regression equation.</li>
+<li>Each of the three regression equations ignores the other two media in forming estimates for the regression coefficients.</li>
+<li>Can be misleading if the media budgets are correlated, like newspaper and radio.</li>
+</ul>
+<p>A better approach is to extend the simple linear regression model so that it can directly accommodate multiple predictors.</p>
+<div id="estimating-coefficients-and-residuals-1" class="section level2">
+<h2>Estimating coefficients and residuals</h2>
+<p><span class="math display">\[Y = \beta_{0} + \beta_{1}X1 + \beta_{2}X2 + · · · + \beta_{p}Xp + Error\]</span></p>
+<p>As in the case of the simple linear model, the objective here is to estimate the coefficients minimizing the sum of squared residuals.</p>
+<center>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+sales
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.938889
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+2.327560 – 3.550218
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+TV
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.045765
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.043031 – 0.048499
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+radio
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.188530
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.171652 – 0.205408
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+newspaper
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.001037
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.012544 – 0.010469
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.860
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+200
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.897 / 0.896
+</td>
+</tr>
+</table>
+</center>
+<pre><code>[1] &quot;Model p-value: &lt; 2.2e-16&quot;</code></pre>
+<p>We interpret these results as follows:</p>
+<ul>
+<li>For a given amount of TV and newspaper advertising, spending an additional $1,000 on radio advertising leads to an increase in sales by approximately 130 units.</li>
+<li>The newspaper regression coefficient estimate in the simple regression case was significantly non-zero, in contrary to the multiple regression model, which is close to zero, and the corresponding p-value is no longer significant (0.7).</li>
+</ul>
+<div class="summary">
+<p>Let’s go back to our initial questions for the <code>Marketing Plan</code>.</p>
+<ol style="list-style-type: decimal">
+<li>Should we spend any money in advertising?</li>
+</ol>
+<ul>
+<li>P-value is almost 0, we can suggest that at least one of the advertising media must be related to sales.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Given a certain advertising budget, can we predict sales?</li>
+</ol>
+<ul>
+<li>Yes, through this equation:</li>
+</ul>
+<p><span class="math display">\[ sales = 2.938889  + 0.045765* TV  + 0.188530*radio  -0.001037*newspaper\]</span> 3. Should we spend the same amount of money in each media?</p>
+<ul>
+<li>The p-values for TV and radio are low, but the p-value for newspaper is not.
+<ul>
+<li>This suggests that only TV and radio are related to sales.
+<center>
+<strong><em>This is referred to as variable selection, and we’ll discuss it later in further detail</em></strong>
+</center></li>
+</ul></li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>How accurately can we predict future sales?</li>
+</ol>
+<ul>
+<li><p>The model that uses all three advertising media to predict sales has an <span class="math inline">\(R^2\)</span> of 0.897 and RSS = 1,457 units (10%).</p></li>
+<li><p>What happens if we use a model with only TV and radio, as newspaper is not significant?</p></li>
+</ul>
+</div>
+</div>
+<div id="model-fit-1" class="section level2">
+<h2>Model fit</h2>
+<pre class="r"><code>lm_sales_tv_radio &lt;- lm(sales ~ TV + radio, data= sales_df)
+lm_sales_tv_radio %&gt;% summary()</code></pre>
+<pre><code>
+Call:
+lm(formula = sales ~ TV + radio, data = sales_df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-8.7977 -0.8752  0.2422  1.1708  2.8328 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  2.92110    0.29449   9.919   &lt;2e-16 ***
+TV           0.04575    0.00139  32.909   &lt;2e-16 ***
+radio        0.18799    0.00804  23.382   &lt;2e-16 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 1.681 on 197 degrees of freedom
+Multiple R-squared:  0.8972,    Adjusted R-squared:  0.8962 
+F-statistic: 859.6 on 2 and 197 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The value of <strong><span class="math inline">\(R^2\)</span> will never decrease when adding an extra predictor</strong> to the model, and this can lead to <code>over-fitting</code>. Adjusted <span class="math inline">\(R^2\)</span> reduces the value of <span class="math inline">\(R^2\)</span> until it becomes an unbiased estimate. It only increases if it reduces the overall error of the predictions is increased by adding an additional variable.</p>
+<div id="residuals" class="section level3">
+<h3>Residuals</h3>
+<p>Another good way to test the quality of the fit of the model is to look at the residuals. An important assumption of the lm is that the error is uncorrelated and randomly distributed.</p>
+<p>In the previous summary, we notice how the residuals are approximately zero. Nevertheless, we also need to check if they have any trend.</p>
+<pre class="r"><code>lm_sales_tv_radio %&gt;% residualPlot()</code></pre>
+<p><img src="lm-sales_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Notice that there is a pattern (like a curve on the residuals). This is not random at all and can be a problem. If we have more data, our linear model will not be able to generalize well.</p>
+<p>It suggests a synergy or <code>interaction</code> effect between the advertising media, whereby combining the media together results in a bigger boost to sales than using any single medium.</p>
+</div>
+</div>
+<div id="interaction-effect" class="section level2">
+<h2>Interaction effect</h2>
+<p>One way of extending this model to allow for interaction effects is to include a third predictor, called an interaction term (TV*radio). This results in the model:</p>
+<span class="math display">\[sales = \beta{0} + \beta{1}TV + \beta{2}radio + \beta{3}TVradio + Error\]</span>
+<center>
+<pre class="r"><code>sales_df[, TVradio := TV*radio]
+lm_inter &lt;- lm(sales ~ TV + radio + TVradio, data= sales_df)
+tab_model(lm_inter, file=&quot;summary2.html&quot;)</code></pre>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+sales
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+6.75
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+6.26 – 7.24
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+TV
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.02 – 0.02
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+radio
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.03
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.01 – 0.05
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.001</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+T Vradio
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.00 – 0.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+200
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.968 / 0.967
+</td>
+</tr>
+</table>
+</center>
+<p>In conclusion:</p>
+<ul>
+<li>The model that includes the interaction term is superior to the model that contains only main effects.</li>
+<li>The p-value for the interaction term, TVradio, is extremely low.</li>
+<li>The <span class="math inline">\(R^2\)</span> for the model is 96.8%, compared to 89.7% (model without interaction term).</li>
+<li>This means that the interaction term explains</li>
+</ul>
+<pre class="r"><code>(96.8 - 89.7)*100/(100 - 89.7)</code></pre>
+<pre><code>[1] 68.93204</code></pre>
+<p>of the variability in sales that remains after fitting the additive model.</p>
+<ul>
+<li>An increase in TV advertising of $1,000 is associated with increased sales of 19 + 1.1(radio units). And an increase in radio advertising of $1,000 will be associated with 29 + 1.1(TV units).</li>
+</ul>
+</div>
+</div>
+<div id="variable-selection" class="section level1 tabset tabset-fade">
+<h1>Variable Selection</h1>
+<p>Here, let’s explore how to pick best regressors and assess the model fit in a multivariate scenario.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<div class="figure" style="text-align: center">
+<img src="lm-sales_files/figure-html/unnamed-chunk-16-1.png" alt="Correlation Matrix" width="672" />
+<p class="caption">
+Correlation Matrix
+</p>
+</div>
+<p><strong>VIF</strong> The variance inflation factor (VIF) quantifies the extent of correlation between predictors. It is used for diagnosing collinearity/multicollinearity. <em>Values of 10 or more are considered very high.</em></p>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+VIF
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Cholesterol
+</th>
+<th style="text-align:right;">
+Sodium
+</th>
+<th style="text-align:right;">
+Fiber
+</th>
+<th style="text-align:right;">
+Sugar
+</th>
+<th style="text-align:right;">
+Protein
+</th>
+<th style="text-align:right;">
+Calcium
+</th>
+<th style="text-align:right;">
+Nuts
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2.1
+</td>
+<td style="text-align:right;">
+1.15
+</td>
+<td style="text-align:right;">
+2.62
+</td>
+<td style="text-align:right;">
+2.59
+</td>
+<td style="text-align:right;">
+2.45
+</td>
+<td style="text-align:right;">
+1.45
+</td>
+<td style="text-align:right;">
+1.86
+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="subset-selection" class="section level2">
+<h2>Subset Selection</h2>
+<strong>Using the right measure of the lack of fit</strong>
+<center>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+Calories
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+5.51
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+3.53 – 7.49
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Cholesterol
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.00
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.35 – 3.36
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.415
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Sodium
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.19
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.34 – -0.03
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.030</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Fiber
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+5.40
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-8.26 – 19.06
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.449
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Sugar
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.05
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-4.92 – 0.83
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.181
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Protein
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.35
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.35 – 14.35
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.055
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Calcium
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.99
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-1.66 – 3.64
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.475
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Nuts
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.06
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.40 – 0.27
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.717
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+25
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.653 / 0.510
+</td>
+</tr>
+</table>
+<p><img src="lm-sales_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>[1] &quot;rss- min: 1.78057864159931&quot;
+[1] &quot;adjr2- max: 0.548423775117918&quot;</code></pre>
+</center>
+<p>The Cp (Mallow’s Cp ) and BIC (Bayesian information criterion) statistic add a penalty to the training RSS in order to adjust for the fact that the training error tends to underestimate the test error. (to account for the bias due to overfitting)</p>
+<p>the model with the lowest BIC is the 3-variable model that contains only Sodium, Sugar and Protein.</p>
+<pre class="r"><code>coef(regfit.full, 3) %&gt;% round(2) %&gt;% t() %&gt;% PrettyTable(&quot;Best Regressors coefficients&quot;)</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Best Regressors coefficients
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+(Intercept)
+</th>
+<th style="text-align:right;">
+Sodium
+</th>
+<th style="text-align:right;">
+Sugar
+</th>
+<th style="text-align:right;">
+Protein
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+5.89
+</td>
+<td style="text-align:right;">
+-0.2
+</td>
+<td style="text-align:right;">
+-2.25
+</td>
+<td style="text-align:right;">
+7.99
+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+<div id="validation-set-approach" class="section level2">
+<h2>Validation Set Approach</h2>
+<p>Here we measure the error directly using the test data set.</p>
+<p><img src="lm-sales_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>[1] &quot;rss- min: 1.08964249153976&quot;
+[1] &quot;adjr2- max: 0.45817073977215&quot;</code></pre>
+The best model is the one that contains 2 variables to predict calories.
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Best Regressors coefficients
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+(Intercept)
+</th>
+<th style="text-align:right;">
+Cholesterol
+</th>
+<th style="text-align:right;">
+Sugar
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+6.61
+</td>
+<td style="text-align:right;">
+3.04
+</td>
+<td style="text-align:right;">
+-3.94
+</td>
+</tr>
+</tbody>
+</table>
+<p>It’s good practice to use a train/test approach with cross-validation…</p>
+<hr />
+</div>
+<div id="shrinking" class="section level2">
+<h2>Shrinking</h2>
+<p>This is an alternative for least squares approach.</p>
+<pre><code>[1] &quot;Error : 0.119560031541567&quot;</code></pre>
+<strong>Coefficient</strong>
+<table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Lasso coefficients
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+(Intercept)
+</th>
+<th style="text-align:right;">
+Cholesterol
+</th>
+<th style="text-align:right;">
+Sodium
+</th>
+<th style="text-align:right;">
+Fiber
+</th>
+<th style="text-align:right;">
+Sugar
+</th>
+<th style="text-align:right;">
+Protein
+</th>
+<th style="text-align:right;">
+Calcium
+</th>
+<th style="text-align:right;">
+Nuts
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-0.006
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-1.025
+</td>
+<td style="text-align:right;">
+3.981
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<strong>Model Summary</strong>
+<center>
+<table style="border-collapse:collapse; border:none;">
+<tr>
+<th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; ">
+ 
+</th>
+<th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; ">
+Calories
+</th>
+</tr>
+<tr>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; ">
+Predictors
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+Estimates
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+CI
+</td>
+<td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  ">
+p
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+(Intercept)
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+5.91
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+4.31 – 7.51
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>&lt;0.001
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Sodium
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.19
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.33 – -0.05
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.017</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Sugar
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-2.47
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-4.91 – -0.03
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.061
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Protein
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+7.12
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.84 – 13.39
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+<strong>0.038</strong>
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; ">
+Calcium
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+1.41
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+-0.72 – 3.54
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  ">
+0.209
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;">
+Observations
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3">
+25
+</td>
+</tr>
+<tr>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;">
+R<sup>2</sup> / R<sup>2</sup> adjusted
+</td>
+<td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3">
+0.636 / 0.563
+</td>
+</tr>
+</table>
+</center>
+<!-- **Residuals** -->
+<!-- ```{r, fig.align='center', echo=FALSE} -->
+<!-- lm2_bars %>% residualPlot() -->
+<!-- ``` -->
+<hr />
+</div>
+<div id="partial-least-squares" class="section level2">
+<h2>Partial least squares</h2>
+<p>If we choose to use all the available predictors, we can overcome collinearity issues by applying this.</p>
+PLS is a supervised alternative to Principal Component Regression (PCR), where the approach attempts to find directions that help explain both the response and the predictors.
+<div class="figure" style="text-align: center">
+<img src="lm-sales_files/figure-html/unnamed-chunk-25-1.png" alt="The first 3 components are able to explain 60% of the calories variance" width="672" />
+<p class="caption">
+The first 3 components are able to explain 60% of the calories variance
+</p>
+</div>
+<pre><code>[1] &quot;Error : 0.168368370388753&quot;</code></pre>
+<p><strong>Regressors Importance</strong></p>
+<p>With this in mind, we run an importance graph. Here, importance is based on how much a regressor explains the components used to predict Calories For <code>Calories</code>, the primary drivers are: Protein and Sugar.</p>
+<pre class="r"><code>mod1 &lt;- train(frmla2, data = df_bars, method = &quot;pls&quot;, preProc = c(&quot;center&quot;,&quot;scale&quot;))
+plot(varImp(mod1), main = &quot;PLS-DA&quot;)</code></pre>
+<p><img src="lm-sales_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<div class="summary">
+<ul>
+<li><p>Check on regressors collinearity before including them in the model.</p></li>
+<li><p>Avoid mixing data with high structural collinearity</p></li>
+<li><p>Use more robust statistics, like BIC instead of RSS to determine the best relationships between regressors and response variable.</p></li>
+<li><p>Use adjusted R-square instead of regular R-square</p></li>
+<li><p>Check residuals and transform data prior to model fitting if necessary</p></li>
+<li><p>Pick the simplest scientific explanation that fits the evidence.</p></li>
+<li><p>Have fun!</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="section" class="section level1">
+<h1></h1>
+<hr />
+</div>
+<div id="case-study" class="section level1 tabset">
+<h1>Case Study</h1>
+<div id="initial-state" class="section level2">
+<h2>Initial state:</h2>
+<ul>
+<li>30,000 data points with information about 12 different features in order to predict Y.</li>
+<li>340 separate non-linear regressions were developed.</li>
+<li>The maximum number of features were considered for every model, selecting the best model based on simple <span class="math inline">\(R^2\)</span>.</li>
+<li>Training error was very different to testing error.</li>
+<li>These models were more complex (non-linear)</li>
+<li>Best models were selected based on <span class="math inline">\(R^2\)</span> instead of adjusted <span class="math inline">\(R^2\)</span>.</li>
+</ul>
+</div>
+<div id="alternative" class="section level2">
+<h2>Alternative:</h2>
+<ul>
+<li>Check on regressors collinearity before including them in the model.</li>
+<li>Avoid mixing data with high structural collinearity.</li>
+<li>Use BIC statistics and adjusted R-square instead of simple R-square to determine best relationships between regressors and response variable.</li>
+</ul>
+</div>
+<div id="results" class="section level2">
+<h2>Results:</h2>
+<ul>
+<li>Simple linear models</li>
+<li>Used train/test approach with cross validation
+<ul>
+<li>More robust</li>
+</ul></li>
+<li>Picked models with the least BIC
+<ul>
+<li>Avoid overfitting.</li>
+</ul></li>
+<li>General equations at Offshore/Onshore level show adjusted <span class="math inline">\(R^2\)</span>= 83%.</li>
+</ul>
+<p><code>See Power BI</code> <!-- </div> --></p>
+</div>
+</div>
+
+&nbsp;
+<hr />
+  <p style="text-align: center;">A work by K.W. & H.M.</p>
+    <p style="text-align: center;"><span style="color: #808080;"><em>hubert.marcus@ihsmarkit.com</em></span></p>
+    <p style="text-align: center;"><span style="color: #808080;"><em>kenia.way@ihsmarkit.com</em></span></p>
+&nbsp;
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

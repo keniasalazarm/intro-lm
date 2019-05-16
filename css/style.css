@@ -1,0 +1,21 @@
+h1, .h1, h2, .h2, h3, .h3 {
+  margin-top: 21px;
+}
+
+.summary {
+  background-color:#e6f0ff;
+  border-radius: 5px; 
+  padding: 20px;
+}
+.toc-content {
+  text-align: justify;
+  font-size: large;
+}
+
+.main-container {
+  max-width: 1600px;
+}
+
+.container-fluid {
+  padding-right: 10px;
+}
