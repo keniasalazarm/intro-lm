@@ -1,9 +1,6 @@
 ---
 title: "Linear Regression in Data Analysis"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '5'
   html_document:
     css: css/style.css
     includes:
@@ -13,6 +10,9 @@ output:
     toc: yes
     toc_depth: 5
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
 ---
 
 ```{r setup, include=FALSE}
@@ -218,7 +218,7 @@ A better approach is to extend the simple linear regression model so that it can
 
 ## Estimating coefficients and residuals
 
-$$Y = \beta_{0} + \beta_{1}X1 + \beta_{2}X2 + · · · + \beta_{p}Xp + Error$$
+$$Y = \beta_{0} + \beta_{1}X1 + \beta_{2}X2 + ... + \beta_{p}Xp + Error$$
 
 As in the case of the simple linear model, the objective here is to estimate the coefficients minimizing the sum of squared residuals.
 
@@ -508,5 +508,6 @@ plot(varImp(mod1), main = "PLS-DA")
     + Avoid overfitting.
 * General equations at Offshore/Onshore level show adjusted $R^2$= 83%.
   
-`See Power BI`
+`See Power BI` in this guide repo!
+[lm-guide](https://github.com/keniasalazarm/intro-lm)
 <!-- </div> -->
